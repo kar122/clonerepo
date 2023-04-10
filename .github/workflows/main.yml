@@ -18,10 +18,11 @@ jobs:
             choco Install azure-cli -y
       - name: Clone ARM-TTK 
         run: |
+          mkdir karthik
+          cd .\karthik
           git clone https://github.com/Azure/arm-ttk.git
       - name: Validate ARM templates using ARM-TTK
         shell: pwsh
-        working-directory: ./clonerepo/arm-ttk/arm-ttk
         run: |
           Import-Module .\arm-ttk.psd1
-          Test-AzTemplate -TemplatePath ./mainTemplate.json
+          Test-AzTemplate -TemplatePath .\mainTemplate.json
