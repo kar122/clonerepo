@@ -1,10 +1,8 @@
 name: ARM-TTK Validation
-
-on:
+'on':
   push:
     branches:
       - main
-
 jobs:
   build_and_test:
     runs-on: windows-latest
@@ -12,17 +10,26 @@ jobs:
       - name: Install Azure PowerShell Module
         uses: Azure/powershell@v1
         with:
-          azPSVersion: '3.1.0'
-          inlineScript: |
-            Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          azPSVersion: 3.1.0
+          inlineScript: >
+            Set-ExecutionPolicy Bypass -Scope Process -Force;
+            [System.Net.ServicePointManager]::SecurityProtocol =
+            [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex
+            ((New-Object
+            System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
             choco Install azure-cli -y
-      - name: Clone ARM-TTK 
+      - name: Clone ARM-TTK
         run: |
           git clone https://github.com/Azure/arm-ttk.git
       - name: Validate ARM templates using ARM-TTK
         shell: pwsh
-        working-directory: ./arm-ttk
         run: |
-          cd ./arm-ttk
           Import-Module .\arm-ttk.psd1
           Test-AzTemplate -TemplatePath ./mainTemplate.json
+  PowerShell_Core_Workflow:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run PowerShell script
+        run: pwsh -command "& './script.ps1'"
