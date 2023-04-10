@@ -1,4 +1,4 @@
-name: Clone Repo
+name: ARM-TTK Validation
 
 on:
   push:
@@ -6,12 +6,24 @@ on:
       - main
 
 jobs:
-  clone_repo:
+  build_and_test:
     runs-on: windows-latest
     steps:
-      - name: Clone Repo
-        uses: actions/checkout@v2
+      - name: Install Azure PowerShell Module
+        uses: Azure/powershell@v1
         with:
-          repository: Azure/arm-ttk
-          ref: armttk
-          path: kar122/clonerepo/armttk
+          azPSVersion: '3.1.0'
+          inlineScript: |
+            Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+            choco Install azure-cli -y
+      - name: Clone ARM-TTK 
+        run: |
+          git clone https://github.com/Azure/arm-ttk.git
+      - name: Validate ARM templates using ARM-TTK
+        shell: pwsh
+        working-directory: ./arm-ttk
+        run: |
+          cd arm-ttk
+          Get-ChildItem *.ps1, *.psd1, *.ps1xml, *.psm1 -Recurse | Unblock-File
+          Import-Module .\arm-ttk.psd1
+          $testOutput = @(Test-AzTemplate -TemplatePath ./mainTemplate.json) 
