@@ -21,8 +21,8 @@ jobs:
           git clone https://github.com/Azure/arm-ttk.git
       - name: Validate ARM templates using ARM-TTK
         shell: pwsh
-        working-directory: ./clonerepo/clonerepo/arm-ttk
+        working-directory: ./arm-ttk
         run: |
-          Get-ChildItem *.ps1, *.psd1, *.ps1xml, *.psm1 -Recurse | Unblock-File
+          cd ./arm-ttk
           Import-Module .\arm-ttk.psd1
           Test-AzTemplate -TemplatePath ./mainTemplate.json
