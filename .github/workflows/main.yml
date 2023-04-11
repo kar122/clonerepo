@@ -1,29 +1,39 @@
-name: ARM-TTK Validation
-
+name: Azure Template Tests
 on:
   push:
     branches:
       - main
-
 jobs:
-  build_and_test:
-    runs-on: windows-latest
+  test_templates:
+    runs-on: ubuntu-latest
+    env:
+      ttk.folder: ./file
+      ttk.uri: https://raw.githubusercontent.com/kar122/aksmanagedapp/main/app.zip
+      ttk.asset.filename: app.zip
+      sample.folder: ./mainTemplate.json
     steps:
-      - name: Install Azure PowerShell Module
-        uses: Azure/powershell@v1
-        with:
-          azPSVersion: '3.1.0'
-          inlineScript: |
-            Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-            choco Install azure-cli -y
-      - name: Clone ARM-TTK 
-        timeout-minutes: 5
+      - name: Download TTK
         run: |
-          mkdir karthik
-          cd .\karthik
-          git clone https://github.com/Azure/arm-ttk.git
-      - name: Validate ARM templates using ARM-TTK
-        shell: pwsh
+          New-Item '$(ttk.folder)' -ItemType Directory
+          Invoke-WebRequest -uri '$(ttk.uri)' -OutFile "$(ttk.folder)/$(ttk.asset.filename)" -Verbose
+          Get-ChildItem '$(ttk.folder)' -Recurse
+          Write-Host "Expanding files..."
+          Expand-Archive -Path '$(ttk.folder)/*.zip' -DestinationPath '$(ttk.folder)' -Verbose
+          Write-Host "Expanded files found:"
+          Get-ChildItem '$(ttk.folder)' -Recurse
+        displayName: Download TTK
+      - name: Run Best Practices Tests
         run: |
-          Import-Module .\arm-ttk.psd1
-          Test-AzTemplate -TemplatePath .\mainTemplate.json
+          Import-Module $(ttk.folder)/arm-ttk/arm-ttk.psd1 -Verbose
+          $testOutput = @(Test-AzTemplate -TemplatePath "$(sample.folder)")
+          $testOutput
+          if ($testOutput | ? {$_.Errors }) {
+            exit 1 
+          } else {
+            Write-Host "##vso[task.setvariable variable=result.best.practice]$true"
+            exit 0
+          } 
+        errorActionPreference: continue
+        failOnStderr: true
+        displayName: Run Best Practices Tests
+        continueOnError: true
