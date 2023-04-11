@@ -1,0 +1,32 @@
+name: ARM TTK Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [arm64]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-pip
+        pip3 install -r requirements.txt
+      
+    - name: Capture JSON file
+      run: |
+        curl -o mainTemplate.json https://raw.githubusercontent.com/kar122/clonerepo/main/mainTemplate.json
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+        git add mainTemplate.json
+        git commit -m "Add JSON file"
+        git push
