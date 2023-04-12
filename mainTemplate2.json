@@ -26,18 +26,18 @@
             "description":"The location of AKS resource."
          }
       },
-      // "vmSize":{
-      //    "type":"String",
-      //    "allowedValues":[
-      //       "Standard_B4ms",
-      //       "Standard_DS2_v2",
-      //       "Standard_D4s_v3"
-      //    ],
-      //    "defaultValue":"Standard_DS2_v2",
-      //    "metadata":{
-      //       "description":"VM size"
-      //    }
-      // },
+      "vmSize":{
+         "type":"String",
+         "allowedValues":[
+            "Standard_B4ms",
+            "Standard_DS2_v2",
+            "Standard_D4s_v3"
+         ],
+         "defaultValue":"Standard_DS2_v2",
+         "metadata":{
+            "description":"VM size"
+         }
+      },
       "vmEnableAutoScale":{
          "type":"Bool",
          "defaultValue":true,
@@ -109,7 +109,7 @@
                   "enableAutoScaling":"[parameters('vmEnableAutoScale')]",
                   "minCount":1,
                   "maxCount":10,
-                  // "vmSize":"[parameters('vmSize')]",
+                  "vmSize":"[parameters('vmSize')]",
                   "osType":"Linux",
                   "storageProfile":"ManagedDisks",
                   "type":"VirtualMachineScaleSets",
