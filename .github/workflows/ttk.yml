@@ -14,17 +14,17 @@ jobs:
         with:
           azPSVersion: '3.1.0'
           inlineScript: |
-            Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-            choco Install azure-cli -y
+            #Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+            #choco Install azure-cli -y
       - name: Clone ARM-TTK 
         timeout-minutes: 5
         run: |
-          mkdir karthik
-          cd .\karthik
-          git clone https://github.com/Azure/arm-ttk.git
+          #mkdir karthik
+          #cd .\karthik
+          #git clone https://github.com/Azure/arm-ttk.git
       - name: Validate ARM templates using ARM-TTK
         shell: pwsh
         run: |
           cd .\karthik
-          Import-Module .\arm-ttk\\arm-ttk.psd1
+          Import-Module .\arm-ttk\arm-ttk.psd1
           Test-AzTemplate -TemplatePath .\mainTemplate.json
