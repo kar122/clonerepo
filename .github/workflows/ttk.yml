@@ -31,6 +31,4 @@ jobs:
           dir
           Import-Module .\arm-ttk\arm-ttk.psd1
           $templatePath = "https://github.com/kar122/clonerepo/blob/main/mainTemplate.json"
-          Set-Location (Split-Path $templatePath -Parent)
-          $expandedTemplate = Expand-AzTemplate -TemplatePath $templatePath
-          Test-AzTemplate -Template $expandedTemplate
+          $testOutput = @(Test-AzTemplate -TemplatePath "$templatePath")
