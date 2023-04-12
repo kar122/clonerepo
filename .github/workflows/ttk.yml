@@ -30,7 +30,7 @@ jobs:
           cd .\arm-ttk
           dir
           Import-Module .\arm-ttk\arm-ttk.psd1
-          $templatePath = mainTemplate.json
+          $templatePath = .\mainTemplate.json
           Set-Location (Split-Path $templatePath -Parent)
           $expandedTemplate = Expand-AzTemplate -TemplatePath $templatePath
           Test-AzTemplate -Template $expandedTemplate
