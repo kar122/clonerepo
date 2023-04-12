@@ -19,8 +19,8 @@
             "type": "String",
             "allowedValues": [
                 "eastus",
-				"westcentralus",
-				"westeurope"
+		"westcentralus",
+		"westeurope"
             ],
             "metadata": {
                 "description": "The location of AKS resource."
