@@ -22,6 +22,11 @@ jobs:
           mkdir karthik
           cd .\karthik
           git clone https://github.com/Azure/arm-ttk.git
+      - name: Upload mainTemplate.json
+        uses: actions/upload-artifact@v2
+        with:
+          name: mainTemplate
+          path: ./karthik/arm-ttk/mainTemplate.json
       - name: Validate ARM templates using ARM-TTK
         shell: pwsh
         run: |
@@ -29,6 +34,11 @@ jobs:
           dir
           cd .\arm-ttk
           dir
-          Import-Module .\arm-ttk\arm-ttk.psd1
           Invoke-WebRequest -Uri "https://github.com/kar122/clonerepo/blob/main/mainTemplate.json" -UseBasicParsing -OutFile "mainTemplate.json"
+          dir
           Test-AzTemplate -Path "mainTemplate.json"
+      - name: Download mainTemplate.json
+        uses: actions/download-artifact@v2
+        with:
+          name: mainTemplate
+          path: ./karthik/arm-ttk
