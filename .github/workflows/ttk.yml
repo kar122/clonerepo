@@ -30,5 +30,6 @@ jobs:
           cd .\arm-ttk
           dir
           Import-Module .\arm-ttk\arm-ttk.psd1
-          Test-AzTemplate -TemplatePath "./mainTemplate.json"
+          Invoke-WebRequest -Uri "https://github.com/kar122/clonerepo/blob/main/mainTemplate.json" -UseBasicParsing -OutFile "mainTemplate.json"
+          Test-AzTemplate -TemplatePath "mainTemplate.json"
     
