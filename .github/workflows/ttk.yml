@@ -26,5 +26,5 @@ jobs:
         shell: pwsh
         run: |
           cd .\karthik
-          Import-Module .\arm-ttk.psd1
+          Import-Module .\arm-ttk\\arm-ttk.psd1
           Test-AzTemplate -TemplatePath .\mainTemplate.json
