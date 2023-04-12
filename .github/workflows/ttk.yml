@@ -19,9 +19,9 @@ jobs:
       - name: Clone ARM-TTK 
         timeout-minutes: 5
         run: |
-          #mkdir karthik
-          #cd .\karthik
-          #git clone https://github.com/Azure/arm-ttk.git
+          mkdir karthik
+          cd .\karthik
+          git clone https://github.com/Azure/arm-ttk.git
       - name: Validate ARM templates using ARM-TTK
         shell: pwsh
         run: |
