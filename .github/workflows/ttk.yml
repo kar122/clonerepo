@@ -33,5 +33,5 @@ jobs:
           Import-Module .\arm-ttk\arm-ttk.psd1
           $url = 'https://raw.githubusercontent.com/kar122/clonerepo/main/mainTemplate2.json'
           $jsonContent = Invoke-WebRequest -Uri $url -UseBasicParsing | Select-Object -ExpandProperty Content | ConvertFrom-Json
-          $jsonContent | ConvertTo-Json | Set-Content -Path "template.json"
-          Test-AzTemplate -TemplatePath "template.json"
+          $jsonContent | ConvertTo-Json | Set-Content -Path "mainTemplate2.json"
+          Test-AzTemplate -TemplatePath "mainTemplate2.json"
