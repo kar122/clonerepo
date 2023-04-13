@@ -1,5 +1,8 @@
-on: [push]
+on:
+  push:
+  
 name: Azure ARM
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -27,12 +30,14 @@ jobs:
 
       # Deploy ARM template
       - name: Run ARM deploy
+        id: deploy
         uses: azure/arm-deploy@v1
         with:
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           resourceGroupName: aksazure
           template: ./azuredeploy.json
-          parameters: location=eastus, vmSize=Standard_DS2_v2, kubernetesVersion=1.26.0, networkPlugin=kubenet, clusterResourceName=akscluster, createNewCluster=true, vmEnableAutoScale=true, vmCount=3, osDiskSizeGB=650, 
+          parameters: location=eastus, vmSize=Standard_DS2_v2, kubernetesVersion=1.26.0, networkPlugin=kubenet, clusterResourceName=akscluster, createNewCluster=true, vmEnableAutoScale=true, vmCount=3, osDiskSizeGB=650 
 
       # Output containerName variable from template
-      - run: echo ${{ steps.deploy.outputs.containerName }}
+      - name: Output containerName
+        run: echo ${{ steps.deploy.outputs.containerName }}
