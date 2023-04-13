@@ -12,7 +12,7 @@ jobs:
 
       # Azure Login
       - name: Azure Login
-        uses: azure/login@v1.6
+        uses: azure/login@v1
         with:
           enable-AzPSSession: true
 
