@@ -32,7 +32,7 @@ jobs:
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
           resourceGroupName: aksazure
           template: ./azuredeploy.json
-          parameters: location=eastus, vmSize=Standard_DS2_v2, kubernetesVersion=1.26.0, networkPlugin=kubenet, 
+          parameters: location=eastus, vmSize=Standard_DS2_v2, kubernetesVersion=1.26.0, networkPlugin=kubenet, clusterResourceName=akscluster, createNewCluster=true, vmEnableAutoScale=true, vmCount=3, osDiskSizeGB=650, 
 
       # Output containerName variable from template
       - run: echo ${{ steps.deploy.outputs.containerName }}
