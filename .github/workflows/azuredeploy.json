@@ -1,67 +1,131 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "metadata": {
-    "_generator": {
-      "name": "bicep",
-      "version": "0.13.1.58284",
-      "templateHash": "13120038605368246703"
-    }
-  },
-  "parameters": {
-    "storageAccountType": {
-      "type": "string",
-      "defaultValue": "Standard_LRS",
-      "allowedValues": [
-        "Premium_LRS",
-        "Premium_ZRS",
-        "Standard_GRS",
-        "Standard_GZRS",
-        "Standard_LRS",
-        "Standard_RAGRS",
-        "Standard_RAGZRS",
-        "Standard_ZRS"
-      ],
-      "metadata": {
-        "description": "Storage Account type"
-      }
-    },
-    "location": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().location]",
-      "metadata": {
-        "description": "The storage account location."
-      }
-    },
-    "storageAccountName": {
-      "type": "string",
-      "defaultValue": "[format('store{0}', uniqueString(resourceGroup().id))]",
-      "metadata": {
-        "description": "The name of the storage account"
-      }
-    }
-  },
-  "resources": [
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2022-09-01",
-      "name": "[parameters('storageAccountName')]",
-      "location": "[parameters('location')]",
-      "sku": {
-        "name": "[parameters('storageAccountType')]"
+   "$schema":"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+   "contentVersion":"1.0.0.0",
+   "parameters":{
+      "clusterResourceName":{
+         "type":"String",
+         "metadata":{
+            "description":"The name of the Managed Cluster resource."
+         }
       },
-      "kind": "StorageV2",
-      "properties": {}
-    }
-  ],
-  "outputs": {
-    "storageAccountName": {
-      "type": "string",
-      "value": "[parameters('storageAccountName')]"
-    },
-    "storageAccountId": {
-      "type": "string",
-      "value": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
-    }
-  }
+      "createNewCluster":{
+         "type":"Bool",
+         "defaultValue":true,
+         "metadata":{
+            "description":"When set to 'true', creates new AKS cluster. Otherwise, an existing cluster is used."
+         }
+      },
+      "location":{
+         "type":"String",
+         "allowedValues":[
+            "eastus",
+            "westcentralus",
+            "westeurope"
+         ],
+         "metadata":{
+            "description":"The location of AKS resource."
+         }
+      },
+      "vmSize":{
+         "type":"String",
+         "allowedValues":[
+            "Standard_B4ms",
+            "Standard_DS2_v2",
+            "Standard_D4s_v3"
+         ],
+         "defaultValue":"Standard_DS2_v2",
+         "metadata":{
+            "description":"VM size"
+         }
+      },
+      "vmEnableAutoScale":{
+         "type":"Bool",
+         "defaultValue":true,
+         "metadata":{
+            "description":"enable auto scaling"
+         }
+      },
+      "vmCount":{
+         "type":"Int",
+         "defaultValue":3,
+         "metadata":{
+            "description":"VM count"
+         }
+      },
+      "osDiskSizeGB":{
+         "defaultValue":650,
+         "minValue":0,
+         "maxValue":1023,
+         "type":"Int",
+         "metadata":{
+            "description":"Disk size (in GiB) to provision for each of the agent pool nodes. This value ranges from 0 to 1023. Specifying 0 will apply the default disk size for that agentVMSize."
+         }
+      },
+      "kubernetesVersion":{
+         "type":"String",
+         "defaultValue":"1.26.0",
+         "metadata":{
+            "description":"The version of Kubernetes."
+         }
+      },
+      "networkPlugin":{
+         "defaultValue":"kubenet",
+         "allowedValues":[
+            "azure",
+            "kubenet"
+         ],
+         "type":"String",
+         "metadata":{
+            "description":"Network plugin used for building Kubernetes network."
+         }
+      }
+   },
+   "variables":{
+      "dnsPrefix":"[concat(parameters('clusterResourceName'),'-dns')]",
+      "osDiskSizeGB":"[int(parameters('osDiskSizeGB'))]"
+   },
+   "resources":[
+      {
+         "type":"Microsoft.ContainerService/managedClusters",
+         "condition":"[parameters('createNewCluster')]",
+         "apiVersion":"2022-03-01",
+         "name":"[parameters('clusterResourceName')]",
+         "location":"[parameters('location')]",
+         "sku":{
+            "name":"Basic",
+            "tier":"Free"
+         },
+         "identity":{
+            "type":"SystemAssigned"
+         },
+         "properties":{
+            "kubernetesVersion":"[parameters('kubernetesVersion')]",
+            "dnsPrefix":"[variables('dnsPrefix')]",
+            "agentPoolProfiles":[
+               {
+                  "name":"agentpool",
+                  "osDiskSizeGB":"[variables('osDiskSizeGB')]",
+                  "count":"[parameters('vmCount')]",
+                  "enableAutoScaling":"[parameters('vmEnableAutoScale')]",
+                  "minCount":1,
+                  "maxCount":10,
+                  "vmSize":"[parameters('vmSize')]",
+                  "osType":"Linux",
+                  "storageProfile":"ManagedDisks",
+                  "type":"VirtualMachineScaleSets",
+                  "mode":"System",
+                  "maxPods":110,
+                  "enableNodePublicIP":false
+               }
+            ],
+            "networkProfile":{
+               "loadBalancerSku":"standard",
+               "networkPlugin":"[parameters('networkPlugin')]"
+            }
+         }
+      }
+   ],
+   "outputs":{
+      
+   }
 }
