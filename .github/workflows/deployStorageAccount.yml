@@ -6,21 +6,34 @@ jobs:
       steps:
 
         # Checkout code
-      - uses: actions/checkout@main
+        - uses: actions/checkout@main
+
+        # Install dependencies
+        - name: Install dependencies
+          run: |
+            sudo apt-get update
+            sudo apt-get install -y jq
+            npm install -g jsonlint
+
+        # Validate JSON file
+        - name: Validate JSON
+          run: |
+            jsonlint -q azuredeploy.json
+            cat azuredeploy.json | jq "." > /dev/null
 
         # Log into Azure
-      - uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+        - uses: azure/login@v1
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
 
         # Deploy ARM template
-      - name: Run ARM deploy
-        uses: azure/arm-deploy@v1
-        with:
-          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
-          resourceGroupName: aksazure
-          template: ./azuredeploy.json
-          parameters: storageAccountType=Standard_LRS
+        - name: Run ARM deploy
+          uses: azure/arm-deploy@v1
+          with:
+            subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
+            resourceGroupName: aksazure
+            template: ./azuredeploy.json
+            parameters: storageAccountType=Standard_LRS
 
         # output containerName variable from template
-      - run: echo ${{ steps.deploy.outputs.containerName }}
+        - run: echo ${{ steps.deploy.outputs.containerName }}
